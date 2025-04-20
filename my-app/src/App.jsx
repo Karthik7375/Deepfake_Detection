@@ -17,15 +17,14 @@ function App() {
     formData.append("file", file);
 
     try {
+      console.log(`http://localhost:8080/api/${type}`)
       const res = await axios.post(`http://localhost:8080/api/${type}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      const { prediction, confidence } = res.data;
-
-      if (type === "image") setImageResult({ prediction, confidence });
-      if (type === "video") setVideoResult({ prediction, confidence });
-      if (type === "audio") setAudioResult({ prediction, confidence });
+      console.log(`Response for ${type}:`, res.data);
+      if (type === "image") setImageResult(res.data);
+      if (type === "videos") setVideoResult(res.data);
+      if (type === "audio") setAudioResult(res.data);
 
     } catch (err) {
       console.error(`Error uploading ${type}:`, err);
@@ -77,7 +76,7 @@ function App() {
             className="p-2 border rounded w-full"
           />
           <button
-            onClick={() => handleUpload(videoFile, "video")}
+            onClick={() => handleUpload(videoFile, "videos")}
             className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
             Submit Video
@@ -89,8 +88,10 @@ function App() {
           <h3 className="text-xl font-semibold mb-2">Video Result</h3>
           {videoResult ? (
             <>
-              <p>Prediction: <strong>{videoResult.prediction}</strong></p>
-              <p>Confidence: <strong>{videoResult.confidence}</strong></p>
+              <p>Audio Prediction: <strong>{videoResult.audioLabel}%</strong></p>
+              <p>Audio Confidence: <strong>{videoResult.audioConfidence*100}</strong></p>
+              <p>Video Prediction: <strong>{videoResult.videoLabel}</strong></p>
+              <p>Video Confidence: <strong>{videoResult.videoConfidence*100}%</strong></p>
             </>
           ) : <p className="text-gray-500">No result yet.</p>}
         </div>
@@ -119,8 +120,8 @@ function App() {
           <h3 className="text-xl font-semibold mb-2">Audio Result</h3>
           {audioResult ? (
             <>
-              <p>Prediction: <strong>{audioResult.prediction}</strong></p>
-              <p>Confidence: <strong>{audioResult.confidence}</strong></p>
+              <p>Prediction: <strong>{audioResult.prediction.toUpperCase()}</strong></p>
+              <p>Confidence: <strong>{audioResult.confidence * 100}%</strong></p>
             </>
           ) : <p className="text-gray-500">No result yet.</p>}
         </div>
